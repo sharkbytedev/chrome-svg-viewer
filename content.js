@@ -53,7 +53,9 @@
     ".zoom-slider { width:80px; height:4px; -webkit-appearance:none; appearance:none; background:#ccc; border-radius:2px; outline:none; cursor:pointer; }",
     ".zoom-slider::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:#888; cursor:pointer; }",
     ".zoom-slider:hover::-webkit-slider-thumb { background:#666; }",
-    ".zoom-label { color:#555; font-weight:500; user-select:none; min-width:32px; text-align:right; }",
+    ".zoom-label { color:#555; font-weight:500; min-width:40px; width:40px; text-align:center; border:1px solid transparent; border-radius:3px; background:transparent; font:inherit; padding:1px 2px; outline:none; }",
+    ".zoom-label:hover { border-color:#ccc; }",
+    ".zoom-label:focus { border-color:#4a90d9; background:#fff; }",
     ".zoom-btn { background:none; border:1px solid #bbb; border-radius:3px; width:18px; height:18px; cursor:pointer; color:#555; font-size:12px; line-height:1; display:flex; align-items:center; justify-content:center; padding:0; }",
     ".zoom-btn:hover { border-color:#888; color:#333; }",
   ].join("\n");
@@ -159,9 +161,23 @@
   zoomIn.addEventListener("click", function () { setZoom(zoomLevel * 1.25); });
   zoomControls.appendChild(zoomIn);
 
-  var zoomPct = document.createElement("span");
+  var zoomPct = document.createElement("input");
+  zoomPct.type = "text";
   zoomPct.className = "zoom-label";
-  zoomPct.textContent = "100%";
+  zoomPct.value = "100%";
+  zoomPct.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      var val = parseInt(zoomPct.value, 10);
+      if (!isNaN(val)) setZoom(val);
+      zoomPct.blur();
+    }
+  });
+  zoomPct.addEventListener("blur", function () {
+    zoomPct.value = zoomLevel + "%";
+  });
+  zoomPct.addEventListener("focus", function () {
+    zoomPct.select();
+  });
   zoomControls.appendChild(zoomPct);
 
   toolbar.appendChild(zoomControls);
@@ -205,7 +221,7 @@
   function setZoom(level) {
     zoomLevel = Math.round(Math.min(1000, Math.max(5, level)));
     zoomSlider.value = String(zoomLevel);
-    zoomPct.textContent = zoomLevel + "%";
+    zoomPct.value = zoomLevel + "%";
 
     if (svgImgEl) {
       svgImgEl.style.transform = "scale(" + (zoomLevel / 100) + ")";
