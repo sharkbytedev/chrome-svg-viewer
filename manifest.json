@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "SVG Background Switcher",
+  "version": "1.0.0",
+  "description": "Change the background color when viewing SVG files in the browser.",
+  "permissions": ["storage", "scripting", "tabs"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "service-worker.js"
+  }
+}
