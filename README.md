@@ -1,4 +1,4 @@
-# SVG Background Switcher
+# SVG Viewer+
 
 Ever opened a white SVG in your browser and stared at a blank page wondering if the file was broken? Yeah, us too. Chrome renders SVGs on a white background, so any white or light-colored artwork just vanishes.
 
