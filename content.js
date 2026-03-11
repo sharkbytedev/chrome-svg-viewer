@@ -49,6 +49,13 @@
     ".swatch-checkerboard { background:repeating-conic-gradient(#808080 0% 25%,#fff 0% 50%) 50%/8px 8px; }",
     ".separator { width:1px; height:16px; background:#ccc; }",
     ".color-input { position:absolute; width:0; height:0; opacity:0; pointer-events:none; }",
+    ".zoom-controls { display:flex; align-items:center; gap:6px; }",
+    ".zoom-slider { width:80px; height:4px; -webkit-appearance:none; appearance:none; background:#ccc; border-radius:2px; outline:none; cursor:pointer; }",
+    ".zoom-slider::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:#888; cursor:pointer; }",
+    ".zoom-slider:hover::-webkit-slider-thumb { background:#666; }",
+    ".zoom-label { color:#555; font-weight:500; user-select:none; min-width:32px; text-align:right; }",
+    ".zoom-btn { background:none; border:1px solid #bbb; border-radius:3px; width:18px; height:18px; cursor:pointer; color:#555; font-size:12px; line-height:1; display:flex; align-items:center; justify-content:center; padding:0; }",
+    ".zoom-btn:hover { border-color:#888; color:#333; }",
   ].join("\n");
 
   // --- State ---
@@ -115,6 +122,50 @@
   toolbar.appendChild(customSwatch);
   toolbar.appendChild(colorInput);
 
+  // --- Zoom Controls ---
+
+  var sep2 = document.createElement("div");
+  sep2.className = "separator";
+  toolbar.appendChild(sep2);
+
+  var zoomControls = document.createElement("div");
+  zoomControls.className = "zoom-controls";
+
+  var zoomLabel = document.createElement("span");
+  zoomLabel.className = "label";
+  zoomLabel.textContent = "Zoom:";
+  zoomControls.appendChild(zoomLabel);
+
+  var zoomOut = document.createElement("button");
+  zoomOut.className = "zoom-btn";
+  zoomOut.textContent = "\u2212";
+  zoomOut.title = "Zoom out";
+  zoomOut.addEventListener("click", function () { setZoom(zoomLevel / 1.25); });
+  zoomControls.appendChild(zoomOut);
+
+  var zoomSlider = document.createElement("input");
+  zoomSlider.type = "range";
+  zoomSlider.className = "zoom-slider";
+  zoomSlider.min = "5";
+  zoomSlider.max = "1000";
+  zoomSlider.value = "100";
+  zoomSlider.addEventListener("input", function () { setZoom(Number(zoomSlider.value)); });
+  zoomControls.appendChild(zoomSlider);
+
+  var zoomIn = document.createElement("button");
+  zoomIn.className = "zoom-btn";
+  zoomIn.textContent = "+";
+  zoomIn.title = "Zoom in";
+  zoomIn.addEventListener("click", function () { setZoom(zoomLevel * 1.25); });
+  zoomControls.appendChild(zoomIn);
+
+  var zoomPct = document.createElement("span");
+  zoomPct.className = "zoom-label";
+  zoomPct.textContent = "100%";
+  zoomControls.appendChild(zoomPct);
+
+  toolbar.appendChild(zoomControls);
+
   shadow.appendChild(toolbar);
 
   // --- Color Application ---
@@ -145,6 +196,36 @@
     applyColor(color);
     chrome.storage.local.set({ [STORAGE_KEY]: color }).catch(function () {});
   }
+
+  // --- Zoom ---
+
+  var zoomLevel = 100;
+  var svgImgEl = document.getElementById("svg-img");
+
+  function setZoom(level) {
+    zoomLevel = Math.round(Math.min(1000, Math.max(5, level)));
+    zoomSlider.value = String(zoomLevel);
+    zoomPct.textContent = zoomLevel + "%";
+
+    if (svgImgEl) {
+      svgImgEl.style.transform = "scale(" + (zoomLevel / 100) + ")";
+      svgImgEl.style.maxWidth = zoomLevel <= 100 ? "100%" : "none";
+      svgImgEl.style.maxHeight = zoomLevel <= 100 ? "calc(100vh - 33px)" : "none";
+    }
+
+    // Allow scrolling when zoomed in
+    svgContainer.style.overflow = zoomLevel > 100 ? "auto" : "hidden";
+  }
+
+  // Mouse wheel zoom
+  svgContainer.addEventListener("wheel", function (e) {
+    e.preventDefault();
+    var factor = e.deltaY < 0 ? 1.1 : 0.9;
+    setZoom(zoomLevel * factor);
+  }, { passive: false });
+
+  // Set initial zoom
+  setZoom(100);
 
   // --- Init ---
 
