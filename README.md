@@ -30,6 +30,10 @@ The extension uses a service worker that listens for tab navigation to `.svg` UR
 - `viewer.html` - HTML viewer page with toolbar and SVG container
 - `content.js` - Toolbar logic, color switching, zoom, and persistence
 
+## Credits
+
+Made with love in Canada by [Sharkbyte Inc.](https://sharkbyte.ca)
+
 ## License
 
 MIT. See [LICENSE](LICENSE) for details.
