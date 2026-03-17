@@ -58,6 +58,10 @@
     ".zoom-label:focus { border-color:#4a90d9; background:#fff; }",
     ".zoom-btn { background:none; border:1px solid #bbb; border-radius:3px; width:18px; height:18px; cursor:pointer; color:#555; font-size:12px; line-height:1; display:flex; align-items:center; justify-content:center; padding:0; }",
     ".zoom-btn:hover { border-color:#888; color:#333; }",
+    ".spacer { flex:1; }",
+    ".logo-link { display:flex; align-items:center; flex-shrink:0; }",
+    ".logo-link img { height:20px; width:20px; display:block; }",
+    ".logo-link:hover { opacity:0.8; }",
   ].join("\n");
 
   // --- State ---
@@ -181,6 +185,23 @@
   zoomControls.appendChild(zoomPct);
 
   toolbar.appendChild(zoomControls);
+
+  var spacer = document.createElement("div");
+  spacer.className = "spacer";
+  toolbar.appendChild(spacer);
+
+  var logoLink = document.createElement("a");
+  logoLink.href = "https://sharkbyte.ca?utm_source=svg-viewer-plus&utm_medium=chrome-extension&utm_campaign=toolbar-logo";
+  logoLink.target = "_blank";
+  logoLink.rel = "noopener";
+  logoLink.className = "logo-link";
+  logoLink.title = "Sharkbyte Inc. - Web Development & Design in Canada";
+
+  var logoImg = document.createElement("img");
+  logoImg.src = chrome.runtime.getURL("sharkbyte-logo.svg");
+  logoImg.alt = "Sharkbyte Inc. - Canadian web development and design agency";
+  logoLink.appendChild(logoImg);
+  toolbar.appendChild(logoLink);
 
   shadow.appendChild(toolbar);
 

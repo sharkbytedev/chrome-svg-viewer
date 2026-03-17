@@ -3,7 +3,7 @@
   "name": "SVG Viewer+",
   "version": "1.0.0",
   "description": "Change the background color when viewing SVG files in the browser.",
-  "permissions": ["storage", "scripting", "tabs"],
+  "permissions": ["storage", "tabs"],
   "host_permissions": ["<all_urls>"],
   "icons": {
     "16": "icon16.png",
@@ -12,5 +12,9 @@
   },
   "background": {
     "service_worker": "service-worker.js"
-  }
+  },
+  "web_accessible_resources": [{
+    "resources": ["sharkbyte-logo.svg"],
+    "matches": ["<all_urls>"]
+  }]
 }
