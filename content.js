@@ -237,25 +237,44 @@
   // --- Zoom ---
 
   var zoomLevel = 100;
+  var baseWidth = 0;
+  var baseHeight = 0;
   var svgImgEl = document.getElementById("svg-img");
+
+  // Calculate the base dimensions that fit the image in the container
+  function calcBaseDimensions() {
+    if (!svgImgEl) return;
+    var natW = svgImgEl.naturalWidth || 300;
+    var natH = svgImgEl.naturalHeight || 150;
+    var conW = svgContainer.clientWidth;
+    var conH = svgContainer.clientHeight;
+    var fit = Math.min(conW / natW, conH / natH, 1);
+    baseWidth = natW * fit;
+    baseHeight = natH * fit;
+  }
+
+  svgImgEl.addEventListener("load", function () {
+    calcBaseDimensions();
+    setZoom(100);
+  });
 
   function setZoom(level) {
     zoomLevel = Math.round(Math.min(1000, Math.max(5, level)));
     zoomSlider.value = String(zoomLevel);
     zoomPct.value = zoomLevel + "%";
 
-    if (svgImgEl) {
-      svgImgEl.style.transform = "scale(" + (zoomLevel / 100) + ")";
-      svgImgEl.style.maxWidth = zoomLevel <= 100 ? "100%" : "none";
-      svgImgEl.style.maxHeight = zoomLevel <= 100 ? "calc(100vh - 33px)" : "none";
+    if (svgImgEl && baseWidth) {
+      var scale = zoomLevel / 100;
+      svgImgEl.style.width = (baseWidth * scale) + "px";
+      svgImgEl.style.height = (baseHeight * scale) + "px";
     }
 
-    // Allow scrolling when zoomed in
     svgContainer.style.overflow = zoomLevel > 100 ? "auto" : "hidden";
   }
 
-  // Mouse wheel zoom
+  // Ctrl+wheel = zoom, plain wheel = scroll
   svgContainer.addEventListener("wheel", function (e) {
+    if (!e.ctrlKey) return;
     e.preventDefault();
     var factor = e.deltaY < 0 ? 1.1 : 0.9;
     setZoom(zoomLevel * factor);
